@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Exam Answer Improver</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>📘 Exam Answer Improver</h1>
+  <p class="subtitle">
+    AI-powered exam evaluation for engineering students
+  </p>
+
+  <!-- Question -->
+  <textarea id="question" placeholder="Enter the exact exam question here..."></textarea>
+
+  <!-- Student Answer -->
+  <textarea id="answer" placeholder="Write your answer here..."></textarea>
+
+  <div class="controls">
+    <!-- Branch Dropdown -->
+<select id="branch">
+  <option value="">Select Branch</option>
+  <option value="IT">Information Technology</option>
+  <option value="CSE">Computer Science</option>
+  <option value="MECH">Mechanical Engineering</option>
+  <option value="ELEC">Electrical Engineering</option>
+  <option value="ENTC">Electronics & Telecommunication</option>
+  <option value="ELEX">Electronics Engineering</option>
+</select>
+
+<!-- Subject Dropdown -->
+<select id="subject">
+  <option value="">Select Subject</option>
+</select>
+
+
+    <!-- Marks -->
+    <select id="marks">
+      <option value="4">4 Marks</option>
+      <option value="6">6 Marks</option>
+      <option value="8">8 Marks</option>
+      <option value="10">10 Marks</option>
+    </select>
+  </div>
+
+  <button id="analyzeBtn" type="button">Analyze Answer</button>
+
+  <pre id="output"></pre>
+</div>
+
+<!-- ✅ SCRIPT: MUST BE AT BOTTOM -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  console.log("JS loaded");
+
+  const subjectsByBranch = {
+    IT: [
+      "Engineering Mathematics",
+      "Data Structures",
+      "Database Management Systems (DBMS)",
+      "Operating Systems",
+      "Computer Networks",
+      "Software Engineering",
+      "Web Technologies",
+      "Artificial Intelligence",
+      "Machine Learning"
+    ],
+    CSE: [
+      "Engineering Mathematics",
+      "Discrete Mathematics",
+      "Data Structures",
+      "Design and Analysis of Algorithms",
+      "Operating Systems",
+      "Computer Networks",
+      "Database Systems",
+      "Theory of Computation"
+    ],
+    MECH: [
+      "Engineering Mechanics",
+      "Strength of Materials",
+      "Thermodynamics",
+      "Fluid Mechanics",
+      "Theory of Machines",
+      "Manufacturing Processes"
+    ],
+    ELEC: [
+      "Basic Electrical Engineering",
+      "Electrical Machines",
+      "Power Systems",
+      "Control Systems",
+      "Power Electronics"
+    ],
+    ENTC: [
+      "Analog Electronics",
+      "Digital Electronics",
+      "Signals and Systems",
+      "Communication Systems",
+      "Microprocessors"
+    ],
+    ELEX: [
+      "Electronic Devices & Circuits",
+      "Microcontrollers",
+      "Embedded Systems",
+      "Signal Processing",
+      "VLSI"
+    ]
+  };
+
+  const branch = document.getElementById("branch");
+  const subject = document.getElementById("subject");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+  const output = document.getElementById("output");
+
+  branch.addEventListener("change", function () {
+    subject.innerHTML = "<option value=''>Select Subject</option>";
+    const list = subjectsByBranch[this.value];
+    if (!list) return;
+
+    list.forEach(function (s) {
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s;
+      subject.appendChild(opt);
+    });
+  });
+
+  analyzeBtn.addEventListener("click", function () {
+    console.log("Analyze clicked");
+
+    output.textContent = "Evaluating...";
+
+    fetch("/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: document.getElementById("question").value,
+        answer: document.getElementById("answer").value,
+        subject: subject.value,
+        marks: document.getElementById("marks").value
+      })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      output.textContent = data.result;
+    })
+    .catch(function (err) {
+      console.error(err);
+      output.textContent = "Error calling backend.";
+    });
+  });
+
+});
+</script>
+
+
+</body>
+</html>
